@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Doov</title>
+<style>
+:root {
+  --bg: #0f0f0f;
+  --bg2: #1a1a1a;
+  --bg3: #242424;
+  --border: #2e2e2e;
+  --text: #f1f1f1;
+  --text2: #aaaaaa;
+  --accent: #7c5cbf;
+  --accent2: #9b7de8;
+  --red: #e05252;
+  --green: #52c47a;
+  --radius: 10px;
+  --font: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;font-family:inherit}
+input,textarea,select{font-family:inherit;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;width:100%;outline:none;font-size:14px;transition:.2s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+img{display:block}
+.hidden{display:none!important}
+
+/* ── Navbar ── */
+#navbar{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(15,15,15,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;z-index:1000}
+#navbar .logo{font-size:22px;font-weight:800;color:var(--accent2);letter-spacing:-1px;margin-right:8px}
+#navbar .logo span{color:var(--text)}
+.search-bar{flex:1;max-width:480px;display:flex;gap:0}
+.search-bar input{border-radius:24px 0 0 24px;border-right:none}
+.search-bar button{background:var(--bg3);border:1px solid var(--border);border-left:none;border-radius:0 24px 24px 0;padding:0 16px;color:var(--text2);transition:.2s}
+.search-bar button:hover{background:var(--border)}
+.nav-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.btn{padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;transition:.2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--bg3)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{opacity:.85}
+.nav-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--border);cursor:pointer}
+.nav-avatar-placeholder{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer;border:2px solid var(--border)}
+.dropdown{position:relative}
+.dropdown-menu{position:absolute;right:0;top:calc(100% + 8px);background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);min-width:180px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:9999}
+.dropdown-menu a,.dropdown-menu button{display:flex;align-items:center;gap:10px;padding:11px 16px;width:100%;text-align:left;color:var(--text);font-size:14px;background:none;border:none;font-family:inherit;transition:.15s}
+.dropdown-menu a:hover,.dropdown-menu button:hover{background:var(--bg3)}
+.dropdown-divider{border:none;border-top:1px solid var(--border);margin:4px 0}
+
+/* ── Layout ── */
+#app{padding-top:58px;min-height:100vh}
+.page{display:none;padding:24px 16px;max-width:1200px;margin:0 auto}
+.page.active{display:block}
+
+/* ── Sidebar ── */
+#home-layout{display:flex;gap:24px;padding-top:72px;max-width:1200px;margin:0 auto;padding-left:16px;padding-right:16px}
+#sidebar{width:200px;flex-shrink:0;position:sticky;top:70px;height:fit-content}
+#sidebar nav a{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:14px;color:var(--text2);transition:.15s;margin-bottom:2px}
+#sidebar nav a:hover,#sidebar nav a.active{background:var(--bg3);color:var(--text)}
+#sidebar nav a svg{flex-shrink:0}
+#main-feed{flex:1;min-width:0}
+
+/* ── Video Grid ── */
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.video-card{background:var(--bg2);border-radius:var(--radius);overflow:hidden;transition:.2s;cursor:pointer}
+.video-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.video-thumb{position:relative;aspect-ratio:16/9;background:#111;overflow:hidden}
+.video-thumb img,.video-thumb video{width:100%;height:100%;object-fit:cover}
+.thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg3);color:var(--text2);font-size:36px}
+.rating-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.8);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700}
+.rating-badge.r15{color:#f4a836}
+.rating-badge.r18{color:var(--red)}
+.visibility-badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.8);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;color:var(--text2)}
+.video-info{padding:12px}
+.video-title{font-weight:600;font-size:14px;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.video-meta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.video-meta .channel-avatar{width:24px;height:24px;border-radius:50%;object-fit:cover}
+.video-stats{font-size:12px;color:var(--text2);margin-top:4px}
+
+/* ── Video Player Page ── */
+#video-page{max-width:1200px;margin:0 auto;padding:80px 16px 24px}
+.video-player-wrap{background:#000;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;max-height:540px}
+.video-player-wrap video{width:100%;height:100%;max-height:540px}
+.video-details{margin-top:16px}
+.video-details h1{font-size:20px;font-weight:700;margin-bottom:8px}
+.video-details-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.channel-row{display:flex;align-items:center;gap:12px;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:16px 0}
+.channel-row .avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.channel-row .avatar-placeholder{width:44px;height:44px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.channel-info{flex:1}
+.channel-name{font-weight:600;font-size:15px}
+.channel-subs{font-size:12px;color:var(--text2)}
+.action-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.action-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;transition:.2s}
+.action-btn:hover{background:var(--border)}
+.action-btn.liked{background:var(--accent);border-color:var(--accent);color:#fff}
+.action-btn.followed{background:var(--bg3);border-color:var(--border)}
+.video-description{background:var(--bg2);border-radius:var(--radius);padding:16px;margin-top:16px;font-size:14px;line-height:1.6;color:var(--text2);white-space:pre-wrap}
+.video-page-grid{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
+@media(max-width:900px){.video-page-grid{grid-template-columns:1fr}}
+
+/* ── Comments ── */
+#comments-section{margin-top:24px}
+#comments-section h3{font-size:16px;font-weight:700;margin-bottom:12px}
+.comment-input-row{display:flex;gap:10px;margin-bottom:20px}
+.comment-input-row .avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.comment-input-row .avatar-ph{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.comment-input-row textarea{flex:1}
+.comment-item{display:flex;gap:10px;margin-bottom:16px}
+.comment-item .avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.comment-item .avatar-ph{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.comment-body{flex:1}
+.comment-author{font-size:13px;font-weight:600;margin-bottom:2px}
+.comment-text{font-size:13px;color:var(--text2);line-height:1.5}
+.comment-time{font-size:11px;color:var(--text2);margin-top:4px}
+
+/* ── Upload ── */
+.upload-area{border:2px dashed var(--border);border-radius:var(--radius);padding:48px;text-align:center;cursor:pointer;transition:.2s;color:var(--text2)}
+.upload-area:hover,.upload-area.drag{border-color:var(--accent);color:var(--accent)}
+.upload-area svg{margin:0 auto 12px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text2)}
+.rating-toggle{display:flex;gap:10px;flex-wrap:wrap}
+.rating-opt{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;transition:.2s}
+.rating-opt input{display:none}
+.rating-opt.selected{border-color:var(--accent);background:rgba(124,92,191,.15);color:var(--accent2)}
+.thumb-preview{width:200px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin-top:8px}
+.progress-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:12px}
+.progress-fill{height:100%;background:var(--accent);width:0;transition:.3s}
+
+/* ── Auth Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:420px;padding:32px;position:relative}
+.modal h2{font-size:22px;font-weight:800;margin-bottom:4px}
+.modal .sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1}
+.modal-close:hover{color:var(--text)}
+.form-submit{width:100%;padding:12px;background:var(--accent);color:#fff;border-radius:8px;font-size:15px;font-weight:700;margin-top:8px;transition:.2s}
+.form-submit:hover{background:var(--accent2)}
+.form-toggle{text-align:center;margin-top:16px;font-size:13px;color:var(--text2)}
+.form-toggle a{color:var(--accent2);cursor:pointer;font-weight:600}
+.error-msg{background:rgba(224,82,82,.15);border:1px solid var(--red);color:var(--red);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px}
+.success-msg{background:rgba(82,196,122,.15);border:1px solid var(--green);color:var(--green);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px}
+
+/* ── Age Gate ── */
+#age-gate{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px}
+#age-gate .box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:380px;text-align:center}
+#age-gate h2{font-size:20px;font-weight:800;margin-bottom:8px;color:var(--red)}
+#age-gate p{font-size:14px;color:var(--text2);margin-bottom:20px}
+
+/* ── Profile ── */
+.profile-header{display:flex;align-items:center;gap:20px;padding:24px 0;border-bottom:1px solid var(--border);margin-bottom:24px;flex-wrap:wrap}
+.profile-avatar{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--border)}
+.profile-avatar-ph{width:80px;height:80px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;border:3px solid var(--border)}
+.profile-info{flex:1}
+.profile-name{font-size:22px;font-weight:800}
+.profile-handle{font-size:14px;color:var(--text2)}
+.profile-stats{display:flex;gap:24px;margin-top:8px}
+.profile-stat{text-align:center}
+.profile-stat .num{font-size:18px;font-weight:700}
+.profile-stat .label{font-size:12px;color:var(--text2)}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:10px 20px;font-size:14px;z-index:9999;transition:.3s;opacity:0;pointer-events:none}
+#toast.show{opacity:1}
+#toast.success{border-color:var(--green);color:var(--green)}
+#toast.error{border-color:var(--red);color:var(--red)}
+
+/* ── Share Modal ── */
+.share-opts{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.share-opt{display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:.2s;font-size:14px}
+.share-opt:hover{background:var(--border)}
+
+/* ── Settings Page ── */
+.settings-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
+.settings-section h3{font-size:16px;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.avatar-edit-wrap{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.avatar-edit-wrap img,.avatar-edit-wrap .avatar-ph-lg{width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.avatar-ph-lg{background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  #home-layout{flex-direction:column;padding-top:66px}
+  #sidebar{width:100%;position:static}
+  #sidebar nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px}
+  #sidebar nav a{flex-shrink:0;padding:8px 12px}
+  .video-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+  .video-page-grid{grid-template-columns:1fr}
+  #video-page{padding:66px 12px 20px}
+  .profile-header{padding:16px 0}
+  .page{padding:16px 12px}
+  .modal{padding:24px 20px}
+}
+@media(max-width:480px){
+  .search-bar{display:none}
+  .video-grid{grid-template-columns:1fr 1fr}
+  #navbar .logo{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav id="navbar">
+  <span class="logo">D<span>OOV</span></span>
+
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="ค้นหาวิดีโอ / Search..." onkeydown="if(event.key==='Enter')doSearch()">
+    <button onclick="doSearch()">🔍</button>
+  </div>
+
+  <div class="nav-actions" id="nav-actions">
+    <button class="btn btn-outline btn-sm" onclick="showModal('login')">เข้าสู่ระบบ</button>
+    <button class="btn btn-primary btn-sm" onclick="showModal('register')">สมัครสมาชิก</button>
+  </div>
+  <div class="nav-actions hidden" id="nav-user">
+    <button class="btn btn-primary btn-sm" onclick="showPage('upload')">+ อัพโหลด</button>
+    <div class="dropdown">
+      <div id="nav-avatar-wrap" onclick="toggleDropdown(this)"></div>
+      <div class="dropdown-menu hidden" id="user-dropdown">
+        <a onclick="goProfile()">👤 ช่องของฉัน</a>
+        <a onclick="showPage('liked')">❤️ วิดีโอที่ถูกใจ</a>
+        <a onclick="showPage('settings')">⚙️ ตั้งค่า</a>
+        <hr class="dropdown-divider">
+        <button onclick="logout()">🚪 ออกจากระบบ</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Age Gate ── -->
+<div id="age-gate" class="hidden">
+  <div class="box">
+    <h2>🔞 เนื้อหาสำหรับผู้ใหญ่</h2>
+    <p>วิดีโอนี้มีเรตติ้ง 18+ กรุณาใส่วันเกิดเพื่อยืนยันอายุ</p>
+    <div class="form-group" style="text-align:left">
+      <label>วันเกิด / Date of Birth</label>
+      <input type="date" id="age-gate-dob" max="">
+    </div>
+    <div id="age-gate-error" class="error-msg hidden"></div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn btn-outline" style="flex:1" onclick="cancelAgeGate()">ยกเลิก</button>
+      <button class="btn btn-primary" style="flex:1" onclick="confirmAge()">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Auth Modal ── -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModal(event)">
+  <!-- Login -->
+  <div class="modal hidden" id="modal-login">
+    <button class="modal-close" onclick="closeAllModals()">✕</button>
+    <h2>เข้าสู่ระบบ</h2>
+    <p class="sub">ยินดีต้อนรับกลับมา 👋</p>
+    <div id="login-error" class="error-msg hidden"></div>
+    <div class="form-group"><label>ชื่อผู้ใช้หรืออีเมล</label><input type="text" id="login-user" placeholder="username หรือ email"></div>
+    <div class="form-group"><label>รหัสผ่าน</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="form-submit" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <p class="form-toggle">ยังไม่มีบัญชี? <a onclick="showModal('register')">สมัครเลย</a></p>
+  </div>
+  <!-- Register -->
+  <div class="modal hidden" id="modal-register">
+    <button class="modal-close" onclick="closeAllModals()">✕</button>
+    <h2>สมัครสมาชิก</h2>
+    <p class="sub">เข้าร่วม Doov วันนี้ 🎬</p>
+    <div id="reg-error" class="error-msg hidden"></div>
+    <div class="form-group"><label>ชื่อที่แสดง</label><input type="text" id="reg-name" placeholder="ชื่อของคุณ"></div>
+    <div class="form-group"><label>ชื่อผู้ใช้</label><input type="text" id="reg-user" placeholder="username (ตัวพิมพ์เล็ก ไม่มีช่องว่าง)"></div>
+    <div class="form-group"><label>อีเมล</label><input type="email" id="reg-email" placeholder="email@example.com"></div>
+    <div class="form-group"><label>รหัสผ่าน (อย่างน้อย 6 ตัว)</label><input type="password" id="reg-pass" placeholder="••••••••"></div>
+    <button class="form-submit" onclick="doRegister()">สมัครสมาชิก</button>
+    <p class="form-toggle">มีบัญชีแล้ว? <a onclick="showModal('login')">เข้าสู่ระบบ</a></p>
+  </div>
+</div>
+
+<!-- ── Report Modal ── -->
+<div class="modal-overlay hidden" id="report-overlay" onclick="closeReport(event)">
+  <div class="modal" style="max-width:360px">
+    <button class="modal-close" onclick="closeReport()">✕</button>
+    <h2>รายงานวิดีโอ</h2>
+    <p class="sub">เลือกเหตุผลในการรายงาน</p>
+    <div id="report-error" class="error-msg hidden"></div>
+    <div class="form-group">
+      <select id="report-reason">
+        <option value="">-- เลือกเหตุผล --</option>
+        <option value="no_rating">ไม่ติดเรตติ้งที่ควรมี</option>
+        <option value="inappropriate">เนื้อหาไม่เหมาะสม</option>
+        <option value="spam">สแปม / โฆษณาเกินจริง</option>
+        <option value="copyright">ละเมิดลิขสิทธิ์</option>
+        <option value="other">อื่นๆ</option>
+      </select>
+    </div>
+    <button class="form-submit" onclick="submitReport()">ส่งรายงาน</button>
+  </div>
+</div>
+
+<!-- ── Share Modal ── -->
+<div class="modal-overlay hidden" id="share-overlay" onclick="closeShare(event)">
+  <div class="modal" style="max-width:360px">
+    <button class="modal-close" onclick="closeShare()">✕</button>
+    <h2>แชร์วิดีโอ</h2>
+    <div class="form-group" style="margin-top:16px">
+      <label>ลิงก์วิดีโอ</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="share-link" readonly>
+        <button class="btn btn-primary btn-sm" style="white-space:nowrap" onclick="copyShareLink()">คัดลอก</button>
+      </div>
+    </div>
+    <div class="share-opts">
+      <div class="share-opt" onclick="shareToDiscord()">
+        <span style="font-size:20px">💬</span>
+        <div>
+          <div style="font-weight:600">Discord</div>
+          <div style="font-size:12px;color:var(--text2)">คัดลอกลิงก์พร้อมชื่อ</div>
+        </div>
+      </div>
+      <div class="share-opt" onclick="shareNative()">
+        <span style="font-size:20px">📤</span>
+        <div>
+          <div style="font-weight:600">แชร์ผ่านแอป</div>
+          <div style="font-size:12px;color:var(--text2)">ใช้ระบบแชร์ของอุปกรณ์</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main App ── -->
+<div id="app">
+
+  <!-- Home -->
+  <div id="home-layout">
+    <aside id="sidebar">
+      <nav>
+        <a href="#" class="active" id="nav-home" onclick="showFeed('home',this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          หน้าหลัก
+        </a>
+        <a href="#" id="nav-trending" onclick="showFeed('trending',this)">
+         
