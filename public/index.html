@@ -202,6 +202,36 @@ img{display:block}
   .search-bar{display:none}
   .video-grid{grid-template-columns:1fr 1fr}
   #navbar .logo{font-size:18px}
+  .nav-actions .btn{padding:6px 10px;font-size:12px}
+  .nav-actions{gap:6px}
+}
+
+/* Force modal always on top and clickable */
+.modal-overlay{
+  position:fixed!important;
+  inset:0!important;
+  z-index:9000!important;
+  touch-action:auto!important;
+}
+.modal{
+  position:relative!important;
+  z-index:9001!important;
+  touch-action:auto!important;
+  -webkit-overflow-scrolling:touch;
+}
+.modal input,.modal button{
+  touch-action:auto!important;
+  -webkit-user-select:text!important;
+  user-select:text!important;
+}
+.form-submit{
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:rgba(124,92,191,0.3)!important;
+  cursor:pointer!important;
+}
+.btn{
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:rgba(255,255,255,0.1)!important;
 }
 </style>
 </head>
@@ -320,28 +350,4 @@ img{display:block}
           <div style="font-weight:600">Discord</div>
           <div style="font-size:12px;color:var(--text2)">คัดลอกลิงก์พร้อมชื่อ</div>
         </div>
-      </div>
-      <div class="share-opt" onclick="shareNative()">
-        <span style="font-size:20px">📤</span>
-        <div>
-          <div style="font-weight:600">แชร์ผ่านแอป</div>
-          <div style="font-size:12px;color:var(--text2)">ใช้ระบบแชร์ของอุปกรณ์</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── Main App ── -->
-<div id="app">
-
-  <!-- Home -->
-  <div id="home-layout">
-    <aside id="sidebar">
-      <nav>
-        <a href="#" class="active" id="nav-home" onclick="showFeed('home',this)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-          หน้าหลัก
-        </a>
-        <a href="#" id="nav-trending" onclick="showFeed('trending',this)">
-         
+      </
